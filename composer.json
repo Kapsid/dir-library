@@ -2,7 +2,7 @@
     "name": "kapsid/dir-sync",
     "description": "Library for syncing json file with file structure.",
     "keywords": ["template", "composer", "package"],
-    "license": "DBAD",
+    "license": "OML",
     "authors": [
         {
             "name": "Martin Urbanczyk",
