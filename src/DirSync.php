@@ -1,14 +1,18 @@
 <?php
 namespace DirSync;
-
 use DirSyncInterface;
 
-class DirSync implements DirSyncInterface {
+class DirSync {
 
     private $rootDir;
+    private $jsonFileContent;
+    private $srcFilePath;
+    private $jsonInput;
 
     public function __construct(){
         $this->rootDir = null;
+        $this->srcFilePath = null;
+        $this->jsonInput = null;
     }
 
     /**
@@ -33,6 +37,7 @@ class DirSync implements DirSyncInterface {
      * @return self
      */
     public function fromFile($filePath){
+        $this->srcFilePath = $filePath;
         return $this;
     }
 
@@ -43,7 +48,8 @@ class DirSync implements DirSyncInterface {
      * @throws \DirSync\Exception
      * @return self
      */
-    public function setJsonInput($JSON){
+    public function setJsonInput(){
+        $this->jsonInput = $this->getJsonInput();
         return $this;
     }
 
@@ -53,7 +59,7 @@ class DirSync implements DirSyncInterface {
      * @return string Return a string JSON data.
      */
     public function getJsonInput(){
-        return $this;
+        return json_decode(file_get_contents($this->srcFilePath), true);
     }
 
 
