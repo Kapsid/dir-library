@@ -1,5 +1,7 @@
 <?php
 
+namespace DirSync;
+
 interface DirSyncInterface {
 
     public function __construct();
@@ -23,22 +25,6 @@ interface DirSyncInterface {
      * @return self
      */
     public function fromFile($filePath);
-
-    /**
-     * Will provide the library with the JSON input
-     *
-     * @param string $JSON A raw string JSON
-     * @throws \DirSync\Exception
-     * @return self
-     */
-    public function setJsonInput($JSON);
-
-    /**
-     * Simply return the previously given JSON data.
-     * @throws \DirSync\Exception
-     * @return string Return a string JSON data.
-     */
-    public function getJsonInput();
 
 
     /**

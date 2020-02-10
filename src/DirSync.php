@@ -1,18 +1,19 @@
 <?php
 namespace DirSync;
-use DirSyncInterface;
 
-class DirSync {
+class DirSync implements DirSyncInterface{
 
     private $rootDir;
     private $jsonFileContent;
     private $srcFilePath;
     private $jsonInput;
+    private $syncState;
 
     public function __construct(){
         $this->rootDir = null;
         $this->srcFilePath = null;
         $this->jsonInput = null;
+        $this->syncState = null;
     }
 
     /**
@@ -25,7 +26,7 @@ class DirSync {
      * @return self
      */
     public function setRootDir($path){
-        $this->rootDir = 'false';
+        $this->rootDir = $path;
         return $this;
     }
 
@@ -38,6 +39,7 @@ class DirSync {
      */
     public function fromFile($filePath){
         $this->srcFilePath = $filePath;
+        $this->setJsonInput();
         return $this;
     }
 
@@ -48,7 +50,7 @@ class DirSync {
      * @throws \DirSync\Exception
      * @return self
      */
-    public function setJsonInput(){
+    private function setJsonInput(){
         $this->jsonInput = $this->getJsonInput();
         return $this;
     }
@@ -58,7 +60,7 @@ class DirSync {
      * @throws \DirSync\Exception
      * @return string Return a string JSON data.
      */
-    public function getJsonInput(){
+    private function getJsonInput(){
         return json_decode(file_get_contents($this->srcFilePath), true);
     }
 
@@ -77,6 +79,35 @@ class DirSync {
      * @return self|array
      */
     public function sync($options=null){
+        $this->syncState = 'DONE';
+        if($this->jsonInput){
+            $this->createDirs($this->rootDir, $this->jsonInput);
+        }
+
         return $this;
+    }
+
+    /**
+     * Function for creating directories on certain location
+     * @param $actualDirectory
+     * @param $actualArrays
+     */
+    private function createDirs($actualDirectory, $actualArrays) {
+        $actualDirectory .= '/';
+        foreach(array_keys($actualArrays) as $directoryName){
+
+            if( is_dir($actualDirectory.$directoryName) === false )
+            {
+                mkdir($actualDirectory.$directoryName);
+            }
+
+            if(isset($actualArrays[$directoryName])){
+                if(is_array($actualArrays[$directoryName])){
+                    $this->createDirs($actualDirectory.$directoryName, $actualArrays[$directoryName]);
+                }
+            }
+
+        }
+
     }
 }
