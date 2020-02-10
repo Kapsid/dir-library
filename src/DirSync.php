@@ -1,7 +1,9 @@
 <?php
 namespace DirSync;
 
-class DirSync implements \DirSyncInterface {
+use DirSyncInterface;
+
+class DirSync implements DirSyncInterface {
 
     private $rootDir;
 
