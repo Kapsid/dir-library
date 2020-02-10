@@ -1,12 +1,12 @@
 {
-    "name": "buonzz/composer-library-template",
-    "description": "Boilerplate package for creating other packages.",
+    "name": "kapsid/dirSync",
+    "description": "Library for syncing json file with file structure.",
     "keywords": ["template", "composer", "package"],
     "license": "DBAD",
     "authors": [
         {
-            "name": "Darwin Biler",
-            "email": "buonzz@gmail.com"
+            "name": "Martin Urbanczyk",
+            "email": "urbanczyk.martin@seznam.cz"
         }
     ],
     "type": "project",
@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Buonzz\\Template\\": "src/"
+            "DirSync\\": "src/"
         }
     }
 }
