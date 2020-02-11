@@ -1,6 +1,5 @@
 <?php
 
-
 namespace DirSync\helpers;
 
 /**

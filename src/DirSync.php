@@ -2,12 +2,10 @@
 namespace DirSync;
 
 use DirSync\helpers\DirectoriesHelper;
-use Tracy\Debugger;
 
 class DirSync implements DirSyncInterface{
 
-    private $rootDir;
-    private $jsonFileContent;
+    public $rootDir;
     private $srcFilePath;
     private $jsonInput;
     private $syncState;
@@ -16,7 +14,6 @@ class DirSync implements DirSyncInterface{
         $this->rootDir = null;
         $this->srcFilePath = null;
         $this->jsonInput = null;
-        $this->syncState = null;
     }
 
     /**
@@ -34,7 +31,7 @@ class DirSync implements DirSyncInterface{
     }
 
     /**
-     * Will read the JSON string directly from a file path;
+     * Will read the JSON string directly from a file path, also setting up parsed json input
      *
      * @param string $filePath A valid json file path
      * @throws \DirSync\Exception
@@ -59,7 +56,7 @@ class DirSync implements DirSyncInterface{
     }
 
     /**
-     * Simply return the previously given JSON data.
+     * Setting decoded data
      * @throws \DirSync\Exception
      * @return string Return a string JSON data.
      */
@@ -82,7 +79,6 @@ class DirSync implements DirSyncInterface{
      * @return self|array
      */
     public function sync($options=null){
-        $this->syncState = 'DONE';
         if($this->jsonInput){
             DirectoriesHelper::createDirectories($this->rootDir, $this->jsonInput);
         }
