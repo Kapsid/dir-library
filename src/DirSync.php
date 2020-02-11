@@ -1,6 +1,8 @@
 <?php
 namespace DirSync;
 
+use Tracy\Debugger;
+
 class DirSync implements DirSyncInterface{
 
     private $rootDir;
@@ -83,7 +85,6 @@ class DirSync implements DirSyncInterface{
         if($this->jsonInput){
             $this->createDirs($this->rootDir, $this->jsonInput);
         }
-
         return $this;
     }
 
@@ -94,12 +95,24 @@ class DirSync implements DirSyncInterface{
      */
     private function createDirs($actualDirectory, $actualArrays) {
         $actualDirectory .= '/';
-        foreach(array_keys($actualArrays) as $directoryName){
+
+        // Load folders in actual dir
+        $currentDirs = $this->parseOriginalDirectories(array_filter(glob($actualDirectory.'*'), 'is_dir'));
+        sort($currentDirs);
+        $jsonDirs = array_keys($actualArrays);
+        sort($jsonDirs);
+
+        foreach($jsonDirs as $directoryName){
+
+            if (($key = array_search($directoryName, $currentDirs)) !== false) {
+                unset($currentDirs[$key]);
+            }
 
             if( is_dir($actualDirectory.$directoryName) === false )
             {
                 mkdir($actualDirectory.$directoryName);
             }
+
 
             if(isset($actualArrays[$directoryName])){
                 if(is_array($actualArrays[$directoryName])){
@@ -107,7 +120,61 @@ class DirSync implements DirSyncInterface{
                 }
             }
 
+            else{
+                $subRemoveDirs = $this->parseOriginalDirectories(array_filter(glob($actualDirectory.$actualArrays[$directoryName].$directoryName.'/*'), 'is_dir'));
+                $this->removeDirectory($subRemoveDirs,$actualDirectory.$actualArrays[$directoryName].$directoryName,true);
+            }
+
+
+
         }
 
+        // Removing unnecesarry dirs
+        $this->removeDirectory($currentDirs,$actualDirectory);
+
+    }
+
+    /**
+     * Parsing directory names
+     * @param $originalArray
+     * @return array
+     */
+    private function parseOriginalDirectories($originalArray){
+        $newArray = [];
+        foreach($originalArray as $originalValue){
+            array_push($newArray,basename($originalValue));
+        }
+
+        return $newArray;
+    }
+
+    /** Function to remove directories
+     * @param $listOfDirectories
+     * @param $actualDirectory
+     * @param bool $subfolder
+     */
+    private function removeDirectory($listOfDirectories, $actualDirectory, $subfolder = false){
+        if(!empty($listOfDirectories)){
+            foreach($listOfDirectories as $unnecessaryDir){
+
+
+                if( is_dir($actualDirectory.$unnecessaryDir) !== false )
+                {
+                    if (PHP_OS === 'Windows')
+                    {
+                        //exec(sprintf("rd /s /q %s/", escapeshellarg($actualDirectory.$actualArrays[$directoryName].$subRemoveDir)));
+                    }
+                    else
+                    {
+                        if($subfolder === false){
+                            exec(sprintf("rm -rf %s", escapeshellarg($actualDirectory.$unnecessaryDir)));
+                        }
+                        else{
+                            exec(sprintf("rm -rf %s/*", escapeshellarg($actualDirectory.$unnecessaryDir)));
+                        }
+                    }
+                }
+            }
+        }
     }
 }
