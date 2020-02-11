@@ -6,9 +6,8 @@ use DirSync\helpers\DirectoriesHelper;
 class DirSync implements DirSyncInterface{
 
     public $rootDir;
-    private $srcFilePath;
-    private $jsonInput;
-    private $syncState;
+    public $srcFilePath;
+    public $jsonInput;
 
     public function __construct(){
         $this->rootDir = null;
@@ -27,6 +26,7 @@ class DirSync implements DirSyncInterface{
      */
     public function setRootDir($path){
         $this->rootDir = $path;
+        //todo set root by default
         return $this;
     }
 
@@ -39,7 +39,6 @@ class DirSync implements DirSyncInterface{
      */
     public function fromFile($filePath){
         $this->srcFilePath = $filePath;
-        $this->setJsonInput();
         return $this;
     }
 
@@ -50,18 +49,24 @@ class DirSync implements DirSyncInterface{
      * @throws \DirSync\Exception
      * @return self
      */
-    private function setJsonInput(){
+    public function setJsonInput(){
         $this->jsonInput = $this->getJsonInput();
-        return $this;
     }
 
     /**
      * Setting decoded data
      * @throws \DirSync\Exception
-     * @return string Return a string JSON data.
+     * @return array Return an array JSON data.
      */
-    private function getJsonInput(){
-        return json_decode(file_get_contents($this->srcFilePath), true);
+    private function getJsonInput() : array{
+
+        try {
+            return json_decode(file_get_contents($this->srcFilePath), true);
+        }
+
+        catch (\Exception $e){
+            throw new \Exception('Invalid Json');
+        }
     }
 
 
