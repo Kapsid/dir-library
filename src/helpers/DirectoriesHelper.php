@@ -29,8 +29,6 @@ class DirectoriesHelper
                     $fullPathDirectory = $actualDirectory.'/'.$unnecessaryDir;
                 }
 
-                Debugger::barDump($fullPathDirectory,"full path");
-
                 if( is_dir($fullPathDirectory) !== false )
                 {
                     if (PHP_OS === 'Windows')
@@ -71,7 +69,7 @@ class DirectoriesHelper
      * @param $actualDirectory
      * @param $actualJsonArray Json passed in DirSync init
      */
-    public static function syncDirectories($actualDirectory, $actualJsonArray) : void {
+    public static function syncDirectories($actualDirectory, $actualJsonArray, $options = false) : void {
 
         // Adding slash to actual dir
         $actualDirectory .= '/';
@@ -83,6 +81,7 @@ class DirectoriesHelper
         sort($currentDirs);
 
         $jsonDirs = array_keys(ActionsHelper::parseActions($actualJsonArray));
+
 
         // Sorting for later comparison
         sort($jsonDirs);
@@ -110,10 +109,11 @@ class DirectoriesHelper
 
             else{
                 $subRemoveDirs = array_filter(glob($actualDirectory.$actualJsonArray[$directoryName].$directoryName.'/*'), 'is_dir');
-                self::removeDirectory($subRemoveDirs,$actualDirectory.$actualJsonArray[$directoryName].$directoryName);
+                self::removeDirectory($subRemoveDirs,$actualDirectory.$actualJsonArray[$directoryName].$directoryName, true);
             }
 
         }
+
 
         // Removing unnecesarry dirs in this level
         self::removeDirectory($currentDirs,$actualDirectory);
