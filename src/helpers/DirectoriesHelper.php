@@ -109,7 +109,7 @@ class DirectoriesHelper
 
             else{
                 $subRemoveDirs = array_filter(glob($actualDirectory.$actualJsonArray[$directoryName].$directoryName.'/*'), 'is_dir');
-                self::removeDirectory($subRemoveDirs,$actualDirectory.$actualJsonArray[$directoryName].$directoryName, true);
+                self::removeDirectory($subRemoveDirs);
             }
 
         }
