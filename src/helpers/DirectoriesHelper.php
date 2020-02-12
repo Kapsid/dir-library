@@ -3,7 +3,6 @@
 namespace DirSync\helpers;
 
 use DirSync\DirSync;
-use Tracy\Debugger;
 
 /**
  * Class DirectoriesHelper
@@ -72,7 +71,7 @@ class DirectoriesHelper
      * @param $actualDirectory
      * @param $actualJsonArray Json passed in DirSync init
      */
-    public static function syncDirectories($actualDirectory, $actualJsonArray, $options = false) : void {
+    public static function syncDirectories($actualDirectory, $actualJsonArray) : void {
 
         // Adding slash to actual dir
         $actualDirectory .= '/';
@@ -84,7 +83,6 @@ class DirectoriesHelper
         sort($currentDirs);
 
         $jsonDirs = array_keys(ActionsHelper::parseActions($actualJsonArray));
-
 
         // Sorting for later comparison
         sort($jsonDirs);
@@ -112,11 +110,10 @@ class DirectoriesHelper
 
             else{
                 $subRemoveDirs = array_filter(glob($actualDirectory.$actualJsonArray[$directoryName].$directoryName.'/*'), 'is_dir');
-                self::removeDirectory($subRemoveDirs);
+                self::removeDirectory($subRemoveDirs,$actualDirectory.$actualJsonArray[$directoryName].$directoryName);
             }
 
         }
-
 
         // Removing unnecesarry dirs in this level
         self::removeDirectory($currentDirs,$actualDirectory);
