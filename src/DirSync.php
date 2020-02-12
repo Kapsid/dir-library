@@ -3,12 +3,38 @@ namespace DirSync;
 
 use DirSync\helpers\DirectoriesHelper;
 
+/**
+ * Class DirSync
+ * @package DirSync
+ * @author Martin Urbanczyk
+ */
 class DirSync implements DirSyncInterface{
 
+    /**
+     * @var string $rootDir
+     */
     public $rootDir;
+
+    /**
+     * @var string $srcFilePath
+     */
     public $srcFilePath;
+
+    /**
+     * @var array $jsonInput
+     */
     public $jsonInput;
 
+    /**
+     * Constants for options
+     */
+    const SYNC_CREATE_ONLY = 'SYNC_CREATE_ONLY';
+    const SYNC_REMOVE_ONLY = 'SYNC_REMOVE_ONLY';
+    const SYNC_ACTIONS_ONLY = 'SYNC_ACTIONS_ONLY';
+
+    /**
+     * DirSync constructor.
+     */
     public function __construct(){
         $this->rootDir = null;
         $this->srcFilePath = null;
@@ -16,17 +42,12 @@ class DirSync implements DirSyncInterface{
     }
 
     /**
-     * Will set the root directory in which the directory
-     * sync will be applied.
-     * If the root directory is not set the Instance should look for
-     * constant "__root__"; if the constant is not provided
-     * then the root is the system root.
-     * @param string $path A valid path to a existing directory
-     * @return self
+     * Setting up root dir
+     * @param string $path
+     * @return $this|DirSyncInterface
      */
-    public function setRootDir($path){
+    public function setRootDir($path) : self {
         $this->rootDir = $path;
-        //todo set root by default
         return $this;
     }
 
@@ -37,19 +58,16 @@ class DirSync implements DirSyncInterface{
      * @throws \DirSync\Exception
      * @return self
      */
-    public function fromFile($filePath){
+    public function fromFile($filePath) : self{
         $this->srcFilePath = $filePath;
         return $this;
     }
 
     /**
-     * Will provide the library with the JSON input
-     *
-     * @param string $JSON A raw string JSON
-     * @throws \DirSync\Exception
-     * @return self
+     * Settomg up json stored in an array
+     * @throws Exception
      */
-    public function setJsonInput(){
+    public function setJsonInput() : void {
         $this->jsonInput = $this->getJsonInput();
     }
 
@@ -58,7 +76,7 @@ class DirSync implements DirSyncInterface{
      * @throws \DirSync\Exception
      * @return array Return an array JSON data.
      */
-    private function getJsonInput() : array{
+    private function getJsonInput() : array {
 
         try {
             return json_decode(file_get_contents($this->srcFilePath), true);
@@ -71,21 +89,29 @@ class DirSync implements DirSyncInterface{
 
 
     /**
-     * Will begin the process of the synchronization.
-     * The process can have the following options:
-     *
-     *  \DirSync::SYNC_CREATE_ONLY - creating directories only;<br>
-     *  \DirSync::SYNC_REMOVE_ONLY - only removing directories;<br>
-     *  \DirSync::SYNC_ACTIONS_ONLY - just run the action but do
-     *  not change the directory tree in any way;<br>
-     *
-     * @param mixed [optional] Additional options for the directory sync process
-     * @throws \DirSync\Exception
-     * @return self|array
+     * Beginning process of synchronization
+     * @param null $options
+     * @return $this
      */
-    public function sync($options=null){
+    public function sync($options=null) : self {
         if($this->jsonInput){
-            DirectoriesHelper::createDirectories($this->rootDir, $this->jsonInput);
+
+            // Checking if root dir is set, otherwise setting actual directory
+            if(!isset($this->rootDir)) $this->rootDir = __DIR__;
+
+            if(is_array($options)){
+                if(in_array(DirSync::SYNC_ACTIONS_ONLY,$options) === false){
+                   // Walkthrough only with actions
+                }
+                else{
+                    // Walkthtough with only adding or only removing passed in parameters
+                }
+            }
+
+            else{
+                // Full sync
+                DirectoriesHelper::syncDirectories($this->rootDir, $this->jsonInput, $options);
+            }
         }
         return $this;
     }
